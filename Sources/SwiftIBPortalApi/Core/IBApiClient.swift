@@ -24,7 +24,7 @@ public class IBApiClient {
     // MARK: Methods
 
     public func makeRequest<Request: IBApiRequest>(_ request: Request) async throws -> Request.Response {
-        return await try withUnsafeThrowingContinuation { continuation in
+        return try await withUnsafeThrowingContinuation { continuation in
             session.request(request.urlRequest).responseDecodable(of: Request.Response.self) { response in
                 continuation.resume(with: response.result)
             }
