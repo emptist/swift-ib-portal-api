@@ -82,9 +82,9 @@ let getPortfolioAccountsRequest = IBPortalApi.Account.GetPortfolioAccounts.Reque
 
 let handle = Task.runDetached {
     do {
-        let ssoValidateResponse = await try apiClient.makeRequest(validateSSORequest)
+        let ssoValidateResponse = try await apiClient.makeRequest(validateSSORequest)
         print(ssoValidateResponse.success)
-        let getPortfolioAccountsResponse = await try apiClient.makeRequest(getPortfolioAccountsRequest)
+        let getPortfolioAccountsResponse = try await apiClient.makeRequest(getPortfolioAccountsRequest)
         print(getPortfolioAccountsResponse.success)
     } catch {
         print(error)

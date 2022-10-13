@@ -9,7 +9,7 @@ import Foundation
 
 public extension APIClient {
     func makeDecodableRequest<T>(_ request: APIRequest<T>, behaviours: [RequestBehaviour] = [], completionQueue: DispatchQueue = DispatchQueue.main) async throws -> T.SuccessType {
-        return await try withUnsafeThrowingContinuation({ continuation in
+        return try await withUnsafeThrowingContinuation({ continuation in
             makeDecodableRequest(request) { result in
                 switch result {
                 case .success(let success):

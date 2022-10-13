@@ -37,55 +37,55 @@ let accountsRequest = IBPortalApi.Account.GetPortfolioAccounts.Request()
 
 let timer = Timer.scheduledTimer(withTimeInterval: 2 * 60, repeats: true) { _ in
     let handle = Task.runDetached {
-        _ = await try? apiClient.makeDecodableRequest(tickleRequest)
+        _ = try? await apiClient.makeDecodableRequest(tickleRequest)
         print("Tickled")
     }
 }
 
 let handle = Task.runDetached {
     do {
-        let ssoResponse = await try apiClient.makeDecodableRequest(ssoValidateRequest)
+        let ssoResponse = try await apiClient.makeDecodableRequest(ssoValidateRequest)
         print(ssoResponse)
-        let authStatusResponse = await try apiClient.makeDecodableRequest(authStatusRequest)
+        let authStatusResponse = try await apiClient.makeDecodableRequest(authStatusRequest)
         print(authStatusResponse)
-        let accountsResponse = await try apiClient.makeDecodableRequest(accountsRequest)
+        let accountsResponse = try await apiClient.makeDecodableRequest(accountsRequest)
         print(accountsResponse)
         guard let firstAccount = accountsResponse.first, let accountId = firstAccount.accountId else {
             return
         }
         let accountSummaryRequest = IBPortalApi.Account.GetPortfolioByAccountIdSummary.Request(accountId: accountId)
-        let accountSummaryResponse = await try apiClient.makeDecodableRequest(accountSummaryRequest)
+        let accountSummaryResponse = try await apiClient.makeDecodableRequest(accountSummaryRequest)
         print(accountSummaryResponse)
         let accountLedgerRequest = IBPortalApi.Account.GetPortfolioByAccountIdLedger.Request(accountId: accountId)
-        let accountLedgerResponse = await try apiClient.makeDecodableRequest(accountLedgerRequest)
+        let accountLedgerResponse = try await apiClient.makeDecodableRequest(accountLedgerRequest)
         print(accountLedgerResponse)
         let positionsRequest = IBPortalApi.Portfolio.GetPortfolioByAccountIdPositionsByPageId.Request(accountId: accountId, pageId: "0")
-        let positionsResponse = await try apiClient.makeDecodableRequest(positionsRequest)
+        let positionsResponse = try await apiClient.makeDecodableRequest(positionsRequest)
         print(positionsResponse)
-        while !(await try apiClient.makeDecodableRequest(authStatusRequest).authenticated ?? false) {
+        while !(try await apiClient.makeDecodableRequest(authStatusRequest).authenticated ?? false) {
             print("Not authenticated")
-            let reauthenticateResponse = await try apiClient.makeDecodableRequest(reauthenticateRequest)
+            let reauthenticateResponse = try await apiClient.makeDecodableRequest(reauthenticateRequest)
             print(reauthenticateResponse)
-            print(await try apiClient.makeDecodableRequest(authStatusRequest))
+            print(try await apiClient.makeDecodableRequest(authStatusRequest))
         }
         print("Authenticated")
         let ordersRequest = IBPortalApi.Order.GetIserverAccountOrders.Request()
         #warning("Something is wrong here, we should not send a body in a get request")
-//        let ordersResponse = await try apiClient.makeDecodableRequest(ordersRequest)
+//        let ordersResponse = try await apiClient.makeDecodableRequest(ordersRequest)
 //        print(ordersResponse)
         let appleConId = "265598"
         let googleConId = "208813720"
         let marketDataSnapshotRequest = IBPortalApi.MarketData.GetIserverMarketdataSnapshot.Request(conids: "\(appleConId),\(googleConId)")
-        let dataSnapshotResponse = await try apiClient.makeDecodableRequest(marketDataSnapshotRequest)
+        let dataSnapshotResponse = try await apiClient.makeDecodableRequest(marketDataSnapshotRequest)
         print(dataSnapshotResponse)
         let dataHistoryRequest = IBPortalApi.MarketData.GetIserverMarketdataHistory.Request(conid: googleConId, exchange: nil, period: "1y", bar: "1d", outsideRth: false)
-//        let dataHistoryResponse = await try apiClient.makeDecodableRequest(dataHistoryRequest)
+//        let dataHistoryResponse = try await apiClient.makeDecodableRequest(dataHistoryRequest)
 //        print(dataHistoryResponse)
         let buyOrderRequest = IBPortalApi.Order.PostIserverAccountByAccountIdOrder.Request(accountId: accountId, body: IBOrderRequest(acctId: accountId, allocationMethod: nil, cOID: "my-google-trade", conid: Int(googleConId)!, fxQty: nil, isCurrencyConversion: false, listingExchange: nil, orderType: "MKT", outsideRTH: false, parentId: nil, price: nil, quantity: 3, referrer: nil, secType: "\(googleConId):STK", side: "BUY", ticker: "GOOG", tif: "DAY", useAdaptive: false))
-        let buyOrderResponse = await try apiClient.makeDecodableRequest(buyOrderRequest)
+        let buyOrderResponse = try await apiClient.makeDecodableRequest(buyOrderRequest)
         print(buyOrderResponse)
         let buyOrderReplyRequest = IBPortalApi.Order.PostIserverReplyByReplyid.Request(replyid: buyOrderResponse.first!.id!, body: IBPortalApi.Order.PostIserverReplyByReplyid.Request.Body(confirmed: true))
-        let buyOrderReplyResponse = await try apiClient.makeDecodableRequest(buyOrderReplyRequest)
+        let buyOrderReplyResponse = try await apiClient.makeDecodableRequest(buyOrderReplyRequest)
         print(buyOrderReplyResponse)
     } catch {
         print(error)
